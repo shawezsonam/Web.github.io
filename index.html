@@ -2,23 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Universal API Web App</title>
+  <title>Universal API + Google Data</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
     h2 { text-align: center; }
-    .box { max-width: 400px; margin: 10px auto; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .box { max-width: 500px; margin: 10px auto; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     input, button { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; }
     button { background: #007bff; color: white; cursor: pointer; }
     button:hover { background: #0056b3; }
-    #products, #messages { margin-top: 10px; }
+    #products, #messages, #gresults { margin-top: 10px; }
     .item { padding: 5px; border-bottom: 1px solid #ddd; }
   </style>
 </head>
 <body>
 
-<h2>Universal API Web App</h2>
+<h2>Universal API + Google Data</h2>
 
-<div class="box" id="signup-box">
+<!-- Signup -->
+<div class="box">
   <h3>Sign Up</h3>
   <input type="text" id="signup-name" placeholder="Full Name">
   <input type="email" id="signup-email" placeholder="Email">
@@ -26,19 +27,22 @@
   <button onclick="signup()">Sign Up</button>
 </div>
 
-<div class="box" id="login-box">
+<!-- Login -->
+<div class="box">
   <h3>Login</h3>
   <input type="email" id="login-email" placeholder="Email">
   <input type="password" id="login-password" placeholder="Password">
   <button onclick="login()">Login</button>
 </div>
 
+<!-- Products -->
 <div class="box">
   <h3>Products</h3>
   <button onclick="loadProducts()">Load Products</button>
   <div id="products"></div>
 </div>
 
+<!-- Messages -->
 <div class="box">
   <h3>Send Message</h3>
   <input type="text" id="message-text" placeholder="Your message">
@@ -49,6 +53,14 @@
   <h3>Messages</h3>
   <button onclick="loadMessages()">Load Messages</button>
   <div id="messages"></div>
+</div>
+
+<!-- Google Search -->
+<div class="box">
+  <h3>Search Google</h3>
+  <input type="text" id="google-query" placeholder="Search anything...">
+  <button onclick="googleSearch()">Search</button>
+  <div id="gresults"></div>
 </div>
 
 <script>
@@ -110,6 +122,24 @@ async function loadMessages() {
   data.messages.forEach((m,i) => {
     list.innerHTML += `<div class='item'>${i+1}. ${m.message}</div>`;
   });
+}
+
+// ✅ Google Data Fetch (Free API)
+async function googleSearch() {
+  const query = document.getElementById("google-query").value;
+  let res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`);
+  let data = await res.json();
+  let list = document.getElementById("gresults");
+  list.innerHTML = "";
+  if (data.RelatedTopics.length > 0) {
+    data.RelatedTopics.forEach(r => {
+      if(r.Text){
+        list.innerHTML += `<div class='item'>🔎 ${r.Text}</div>`;
+      }
+    });
+  } else {
+    list.innerHTML = "No results found.";
+  }
 }
 </script>
 
